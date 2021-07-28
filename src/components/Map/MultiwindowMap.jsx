@@ -7,11 +7,9 @@ import MapControl from './MapControl'
 
 import BaseMapLayer from './layer/BaseMapLayer'
 import MetaLayer from './layer/MetaLayer'
+import UrlLayer from './layer/UrlLayer'
 
-
-// import { Icon } from 'antd';
-
-
+import { Icon } from 'antd';
 
 class MultiwindowMap extends React.PureComponent {
 
@@ -20,7 +18,6 @@ class MultiwindowMap extends React.PureComponent {
         this.state = {
             gxMap: null,
             showDataList: [],
-
             haveMouse: false
         }
     }
@@ -86,13 +83,13 @@ class MultiwindowMap extends React.PureComponent {
     }
     render() {
 
-        let baseLayerMetaInfo = this.props.baseLayerMetaInfo
+        // let baseLayerMetaInfo = this.props.baseLayerMetaInfo
         let serviceType = this.props.serviceType
         let serviceUrl = this.props.serviceUrl
-        let showDataList = this.state.showDataList
+        // let showDataList = this.state.showDataList
         let mapId = this.props.mapId
         let styleObj = this.props.styleObj
-        let clearStyle = this.props.clearStyle
+        // let clearStyle = this.props.clearStyle
 
 
         let obj = {
@@ -103,6 +100,8 @@ class MultiwindowMap extends React.PureComponent {
         let mouseTop = this.props.mouseTop-15 || 20
         let mouseleft = this.props.mouseleft-15 || 20
         let haveMouse = this.props.haveMouse
+        let showDataList = this.props.showDataList
+
         return (
             <div
                 style={
@@ -119,23 +118,25 @@ class MultiwindowMap extends React.PureComponent {
                     onLoad={this.onMapload}
                     onMouseMove={this.onMouseMove}
                 >
-                    {baseLayerMetaInfo &&
+                    {serviceType && serviceUrl &&
                         <BaseMapLayer serviceType={serviceType} serviceUrl={serviceUrl}></BaseMapLayer>
                     }
-                    {
+                    {/* {
                         showDataList && showDataList.length > 0 && showDataList.map(it => <MetaLayer key={it.id} metaInfo={it}></MetaLayer>)
-                    }
+                    } */}
                     {/* {showData && <MetaLayer key={showData.id} metaInfo={showData}></MetaLayer>} */}
-
+                    {
+                        showDataList && typeof(showDataList)!=='string' && showDataList.length > 0 && showDataList.map((it,id) => <UrlLayer key={id} a={id} url={it}></UrlLayer>)
+                    }
                 </MapControl>
-                <div style={Object.assign({ position: 'absolute', zIndex: '1200', backgroundColor: '#fff', borderRadius: '3px' }, clearStyle)}>
+                {/* <div style={Object.assign({ position: 'absolute', zIndex: '1200', backgroundColor: '#fff', borderRadius: '3px' }, clearStyle)}> */}
                     {/* <Button size='small' onClick={this.clearData}>清空</Button> */}
-                    {showDataList && showDataList.length > 0 && showDataList.map(it => <div key={it.id} className='cle' style={{ padding: '2px' }}>
+                    {/* {showDataList && typeof(showDataList)!=='string' && showDataList.length > 0 && showDataList.map((it,id) => <div key={id} className='cle' style={{ padding: '2px' }}>
                         <div className='dot' style={{ width: '100px', float: 'left', lineHeight: '26px' }} title={it.name}>{it.name}</div>
-                        {/* <Icon type="close" className='hover-icon' style={{ float: 'right', marginTop: '6px', marginLeft: '5px', cursor: 'pointer' }} onClick={() => this.closeItem(it)} /> */}
-                    </div>)}
-                </div>
-                {/* {haveMouse !== mapId && <Icon type="plus" style={{ position: 'absolute', top: mouseTop, left: mouseleft, zIndex: 2000, fontSize: '30px', color: '#00ff00' }} />} */}
+                        <Icon type="close" className='hover-icon' style={{ float: 'right', marginTop: '6px', marginLeft: '5px', cursor: 'pointer' }} onClick={() => this.closeItem(it)} />
+                    </div>)} */}
+                {/* </div> */}
+                {haveMouse !== mapId && <Icon type="plus" style={{ position: 'absolute', top: mouseTop, left: mouseleft, zIndex: 2000, fontSize: '30px', color: '#00ff00' }} />}
             </div>
 
         )

@@ -6,13 +6,14 @@ import React from 'react'
 import MapControl from './MapControl'
 
 import BaseMapLayer from './layer/BaseMapLayer'
-import MetaLayer from './layer/MetaLayer'
+// import MetaLayer from './layer/MetaLayer'
 
 import TimelineChart from './timelineChart'
 // import './d3/timeline-chart.css'
 import './timeline-chart.css'
 
-
+import moment from 'moment'
+import UrlLayer from './layer/UrlLayer'
 
 
 class TimeSeriesMap extends React.PureComponent {
@@ -21,9 +22,8 @@ class TimeSeriesMap extends React.PureComponent {
         super(props)
         this.state = {
             gxMap: null,
-
             timeline: null,
-
+            selectTimeItem:null
         }
     }
     componentDidMount() {
@@ -34,13 +34,6 @@ class TimeSeriesMap extends React.PureComponent {
     }
     componentWillUnmount() {
         window.onresize = null
-        // this.props.dispatch({
-        //     type: 'mapData/closeSelectList',
-        // })
-        // this.props.dispatch({
-        //     type: 'mapData/setSelectTimeItem',
-        //     item: null
-        // })
     }
 
     onMapload = (gxMap) => {
@@ -64,11 +57,6 @@ class TimeSeriesMap extends React.PureComponent {
         let showData = this.props.showData
 
         if (showData) {
-            // this.props.dispatch({
-            //     type: 'mapData/selectList',
-            //     item: showData
-            // })
-
             let geometry = JSON.parse(showData.geometry)
             if (geometry) {
                 this.state.gxMap.locationGeometry(geometry)
@@ -77,17 +65,17 @@ class TimeSeriesMap extends React.PureComponent {
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
-        // let metaList = nextProps.mapData.get('selectList')
-        // let selectTimeItem = nextProps.mapData.get('selectTimeItem')
-        let metaList = nextProps.metaList
-        let selectTimeItem = selectTimeItem
-        if (metaList) {
-            let time = this.getTime(metaList)
-            if (this.state.timeline && time) {
-                this.state.timeline.updateXAxis(this.getData(metaList), time.minDt, time.maxDt)
-                this.state.timeline.updateData(this.getData(metaList, selectTimeItem))
+        if(this.props.metaList.length!==nextProps.metaList.length){
+            let metaList = nextProps.metaList
+            // let selectTimeItem = metaList[0]
+            if (metaList) {
+                let time = this.getTime(metaList)
+                if (this.state.timeline && time) {
+                    this.state.timeline.updateXAxis(this.getData(metaList), time.minDt, time.maxDt)
+                    this.state.timeline.updateData(this.getData(metaList, null))
+                }
+    
             }
-
         }
     }
     getTime(list) {
@@ -95,9 +83,9 @@ class TimeSeriesMap extends React.PureComponent {
         let maxDt = new Date();
         list.forEach((it, i) => {
             if (i === 0) {
-                minDt = new Date(Number(it.productTime) - 1000 * 3600 * 24)
+                minDt = new Date(Number(Number(moment(it.productTime).unix())) - 1000 * 3600 * 24)
             }
-            maxDt = new Date(Number(it.productTime) + 1000 * 3600 * 24)
+            maxDt = new Date(Number(Number(moment(it.productTime).unix())) + 1000 * 3600 * 24)
         })
         return {
             minDt: minDt,
@@ -114,17 +102,22 @@ class TimeSeriesMap extends React.PureComponent {
                 // let metaList = this.props.mapData.get('selectList')
                 // let selectTimeItem = this.props.mapData.get('selectTimeItem')
                 let metaList = this.props.metaList
-                let selectTimeItem = this.props.selectTimeItem
+                let selectTimeItem = metaList[0]
                 timeline.updateXAxis(this.getData(metaList, selectTimeItem))
             }
         }
     }
-    clickPoint = (data) => {
-        this.props.dispatch({
-            type: 'mapData/setSelectTimeItem',
-            item: data.metaInfo
-        })
-        let metaList = this.props.mapData.get('selectList')
+    clickPoint = (e) => {
+        // this.props.dispatch({
+        //     type: 'mapData/setSelectTimeItem',
+        //     item: data.metaInfo
+        // })
+        // let metaList = this.props.mapData.get('selectList')
+        let data = e.target.__data__
+
+        const {metaList} = this.props
+        this.setState({selectTimeItem:data.metaInfo})
+
         if (this.state.timeline) {
             this.state.timeline.updateData(this.getData(metaList, data.metaInfo))
         }
@@ -136,7 +129,7 @@ class TimeSeriesMap extends React.PureComponent {
                 data: metaList.map(it => {
                     return {
                         type: TimelineChart.TYPE.POINT,
-                        at: new Date(Number(it.productTime)),
+                        at: new Date(Number(moment(it.productTime).unix())),
                         metaInfo: it,
                         isSelect: clickItem && it.id === clickItem.id
                     }
@@ -149,15 +142,14 @@ class TimeSeriesMap extends React.PureComponent {
 
     render() {
 
-        let baseLayerMetaInfo = this.props.baseLayerMetaInfo
+        // let baseLayerMetaInfo = this.props.baseLayerMetaInfo
         let serviceType = this.props.serviceType
         let serviceUrl = this.props.serviceUrl
         let mapId = this.props.mapId
 
         // let metaList = this.props.mapData.get('selectList')
         // let selectTimeItem = this.props.mapData.get('selectTimeItem')
-        let selectTimeItem = this.props.selectTimeItem
-
+        let selectTimeItem = this.state.selectTimeItem
         let obj = {
             zoomNotShow: this.props.zoomNotShow
         }
@@ -168,13 +160,14 @@ class TimeSeriesMap extends React.PureComponent {
                     obj={obj}
                     onLoad={this.onMapload}
                 >
-                    {baseLayerMetaInfo &&
+                    {serviceType && serviceUrl &&
                         <BaseMapLayer serviceType={serviceType} serviceUrl={serviceUrl}></BaseMapLayer>
                     }
                     {/* {metaList && metaList.map(metaInfo => {
                         return (<MetaLayer key={metaInfo.id} metaInfo={metaInfo}></MetaLayer>)
                     })} */}
-                    {selectTimeItem && <MetaLayer key={selectTimeItem.id} metaInfo={selectTimeItem}></MetaLayer>}
+                    {/* {selectTimeItem && <MetaLayer key={selectTimeItem.id} metaInfo={selectTimeItem}></MetaLayer>} */}
+                    {selectTimeItem && <UrlLayer key={selectTimeItem.id} url={selectTimeItem.url}></UrlLayer>}
                 </MapControl>
                 <div id='d3svg' ref={this.initD3} style={{ height: '70px', position: 'absolute', left: '8px', bottom: '25px', right: '43px', zIndex: 1100, backgroundColor: 'rgba(255, 255, 255, 0.5)', borderRadius: '3px' }}></div>
             </div>

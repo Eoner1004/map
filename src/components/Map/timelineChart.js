@@ -83,13 +83,12 @@ class TimelineChart {
                 return d.data.filter(_ => _.type === TimelineChart.TYPE.POINT);
             })
             .enter();
-
         let xOrt = this.x
         if (this.t) {
             xOrt = this.t
         }
 
-        let defColor = "#1890ff"
+        let defColor = "#606060"
         let selColor = "#f5222d"
         this.circle = this.groupDotItems
             .append('circle')
@@ -103,7 +102,7 @@ class TimelineChart {
             .attr('cx', d => xOrt(d.at))
             .attr('cy', groupHeight / 2 + 5)
             .attr('r', 7)
-            .on('click', this.clickPoint);
+            .on('click', (d)=>this.clickPoint(d));
 
         this.text = this.groupDotItems
             .append("text")
@@ -123,7 +122,7 @@ class TimelineChart {
                 }
                 return
             })
-            .on('click', this.clickPoint);
+            .on('click', (d)=>this.clickPoint(d));
 
 
         this.line = this.groupDotItems

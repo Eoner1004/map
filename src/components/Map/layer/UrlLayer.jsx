@@ -3,7 +3,7 @@ import L from 'leaflet'
 // import * as esri from 'esri-leaflet'
 import bbox from '@turf/bbox';
 
-class MetaLayer extends React.PureComponent {
+class UrlLayer extends React.PureComponent {
     componentWillUnmount() {
         this.removeLayers()
     }
@@ -47,7 +47,9 @@ class MetaLayer extends React.PureComponent {
             }
 
         }
-
+        if (this.props.onRef) {
+            this.props.onRef(layer)
+        }
 
     }
     removeLayers() {
@@ -117,4 +119,4 @@ class MetaLayer extends React.PureComponent {
     }
 }
 
-export default MetaLayer
+export default UrlLayer

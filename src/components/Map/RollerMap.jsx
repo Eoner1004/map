@@ -11,7 +11,8 @@ import './leafletSide/leaflet-side-by-side'
 import MapControl from './MapControl'
 
 import BaseMapLayer from './layer/BaseMapLayer'
-import MetaLayer from './layer/RollerMetaLayer'
+// import MetaLayer from './layer/RollerMetaLayer'
+import UrlLayer from './layer/UrlLayer'
 
 
 // import { Icon } from 'antd';
@@ -132,9 +133,9 @@ class RollerMap extends React.PureComponent {
     }
     onLeftLayer = (layer) => {
         this.leftLayer = layer
+        console.log(this.leftLayer,'this.leftLayer')
         // this.openRoller()
         let sideMap = this.state.sideMap
-
         if (sideMap) {
             sideMap.setLeftLayers(this.leftLayer)
         }
@@ -162,25 +163,31 @@ class RollerMap extends React.PureComponent {
     }
     render() {
 
-        let baseLayerMetaInfo = this.props.baseLayerMetaInfo
+        // let baseLayerMetaInfo = this.props.baseLayerMetaInfo
+        let url = this.props.url
         let serviceType = this.props.serviceType
         let serviceUrl = this.props.serviceUrl
         let mapId = this.props.mapId
+        let sideMap = this.state.sideMap
 
-        let leftData = this.state.leftData
-        let rightData = this.state.rightData
+        // let leftData = this.state.leftData
+        // let rightData = this.state.rightData
+        let leftData = url[0]
+        let rightData = url[1]
         return (
             <div className='brace-up rollermap' onDrop={this.onDrop.bind(this)} onDragOver={this.onDragOver.bind(this)}>
                 <MapControl
                     mapId={mapId}
                     onLoad={this.onMapload}
                 >
-                    {baseLayerMetaInfo &&
+                    {serviceType && serviceUrl &&
                         <BaseMapLayer serviceType={serviceType} serviceUrl={serviceUrl}></BaseMapLayer>
                     }
 
-                    {leftData && <MetaLayer onRef={this.onLeftLayer} key={leftData.id} metaInfo={leftData}></MetaLayer>}
-                    {rightData && <MetaLayer onRef={this.onRightLayer} key={rightData.id} metaInfo={rightData}></MetaLayer>}
+                    {/* {leftData && <MetaLayer onRef={this.onLeftLayer} key={leftData.id} metaInfo={leftData}></MetaLayer>}
+                    {rightData && <MetaLayer onRef={this.onRightLayer} key={rightData.id} metaInfo={rightData}></MetaLayer>} */}
+                    {leftData&& sideMap && <UrlLayer onRef={this.onLeftLayer} key={1} url={leftData}></UrlLayer>}
+                    {rightData&& sideMap  && <UrlLayer onRef={this.onRightLayer} key={2} url={rightData}></UrlLayer>}
                 </MapControl>
 
 

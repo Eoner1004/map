@@ -57,7 +57,7 @@ class BaseMapLayer extends React.PureComponent {
 
     }
     componentWillUnmount() {
-        if (this.baseMapLayer) {
+        if (this.baseMapLayer&&this.props.gxMap) {
             this.props.gxMap.removeLayer(this.baseMapLayer)
         }
     }

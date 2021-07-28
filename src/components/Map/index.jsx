@@ -7,14 +7,23 @@ import TimeSeriesMap from './TimeSeriesMap'
 import RollerMap from './RollerMap'
 
 import BaseMapLayer from './layer/BaseMapLayer'
-import MetaLayer from './layer/MetaLayer'
+// import MetaLayer from './layer/MetaLayer'
 import UrlLayer from './layer/UrlLayer'
 
+let mapList = []
+let timeMap = {}
+let rollerMap = {}
+// 感觉整个Map向是一个测试用的，如果粒度细的话，Map应该不在这个组件里出现，而是在业务系统，你考虑下，在优化下
+// 可以放在example目录中进行测试，这些都是不提交到仓库中的
 export default class Map extends React.Component {
     constructor(props){
         super(props)
         this.state={
             gxMap: null,
+
+            mouseTop: 10,
+            mouseleft: 10,
+            haveMouse: null,
         }
     }
     onMapload = (gxMap) => {
@@ -23,8 +32,61 @@ export default class Map extends React.Component {
             this.props.onMapload(this, gxMap);
         }
     }
+    onMultiwindowMapload = (gxMap, mapId) => {
+        let mapObj = {}
+        mapObj.mapId = mapId
+        mapObj.map = gxMap
+        mapList.push(mapObj)
+        if (mapList.length === 4) {
+            for (let i = 0; i < mapList.length; i++) {
+                let listA = mapList[i]
+                for (let q = 0; q < mapList.length; q++) {
+                    let listB = mapList[q]
+                    if (listA.mapId !== listB.mapId) {
+                        let map1 = listA.map.getMap()
+                        let map2 = listB.map.getMap()
+                        // console.log()
+                        map1.sync(map2)
+                    }
+                }
+            }
+        }
+    }
+    onMouseMove = (e, mapId) => {
+        let containerPoint = e.containerPoint
+        let top = containerPoint.y
+        let left = containerPoint.x
+
+        this.setState({
+            mouseTop: top,
+            mouseleft: left,
+            haveMouse: mapId
+        })
+
+    }
+    onRollerMapload = (gxMap, mapId) => {
+        rollerMap.mapId = mapId
+        rollerMap.map = gxMap
+        setTimeout(() => {
+            if (gxMap) {
+                gxMap.resize()
+            }
+        }, 200)
+    }
+    onTimeMapload = (gxMap, mapId) => {
+        timeMap.mapId = mapId
+        timeMap.map = gxMap
+        setTimeout(() => {
+            if (gxMap) {
+                gxMap.resize()
+            }
+        }, 200)
+    }
+
     render(){
-        const {url,isMapType} = this.props
+        const {url,isMapType, serviceType,serviceUrl, haveMouse} = this.props
+        let mouseTop = this.state.mouseTop || 20
+        let mouseleft = this.state.mouseleft || 20
     let gxMap = this.state.gxMap
     let multiwindowMapList = [
         {
@@ -89,53 +151,30 @@ export default class Map extends React.Component {
                         getCenterPointer={this.getCenterPointer}
 
                     >
-
-                        {/* {gxMap && !isNotShowBaseLayer && baseLayerMetaInfo && */}
-                            <BaseMapLayer serviceType='xyz' serviceUrl='https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'></BaseMapLayer>
+                            <BaseMapLayer serviceType={serviceType} serviceUrl={serviceUrl}></BaseMapLayer>
                             {url&&<UrlLayer url={url}/>}
-                        {/* } */}
-                        {/* {gxMap && isNotShowBaseLayer && serviceType && serviceUrl &&
-                            < BaseMapLayer serviceType={serviceType.value} serviceUrl={serviceUrl.value}></BaseMapLayer>
-                        } */}
-                        {/* {gxMap && serviceItem && <ServiceLayer serviceItem={serviceItem} isCache={this.props.isCache}></ServiceLayer>} */}
-                        {/* {gxMap && thirdServiceUrl && <ThirdServiceLayer thirdServiceUrl={thirdServiceUrl} ></ThirdServiceLayer>} */}
-                        {/* {gxMap && tileItem && <TileLayer tileItem={tileItem} ></TileLayer>} */}
-
-                        {/* {gxMap && metaList && metaList.map((metaInfo, index) => {
-                            return (<MetaLayer key={metaInfo.id} metaInfo={metaInfo} layerIndex={metaInfo.layerIndex || index}></MetaLayer>)
-                        })} */}
-
-                        {/* {gxMap && geometrys && geometrys.length > 0 && <FeatureLayer features={geometrys}></FeatureLayer>} */}
-                        {/* {gxMap && this.props.geometrys && this.props.geometrys.length > 0 && this.props.geometrys.map((item)=>{
-                            return <FeatureLayerPre features={[item]}></FeatureLayerPre>
-                        })} */}
-
-                        {/* {gxMap && plugins.map(plugin => {
-                            return plugin
-                        })} */}
                     </MapControl>}
                     {
                         isMapType === 'timeSeries' && <TimeSeriesMap
-
                             onMapload={this.onTimeMapload}
                             mapId='timeSeriesMap'
-                            baseLayerMetaInfo={baseLayerMetaInfo}
-                            serviceType={serviceType.value}
-                            serviceUrl={serviceUrl.value}
+                            metaList={url}
+                            serviceType={serviceType}
+                            serviceUrl={serviceUrl}
 
                         ></TimeSeriesMap>
                     }
                     {isMapType === 'multiwindow' &&
                         <div className='brace-up'>
-                            {multiwindowMapList.map(it => <MultiwindowMap
+                            {multiwindowMapList.map((it,index) => <MultiwindowMap
+                                showDataList={[url[index]]}
                                 key={it.mapId}
                                 onMapload={this.onMultiwindowMapload}
                                 notShowZoomslider={it.notShowZoomslider}
                                 zoomNotShow={it.zoomNotShow}
                                 mapId={it.mapId}
-                                baseLayerMetaInfo={baseLayerMetaInfo}
-                                serviceType={serviceType.value}
-                                serviceUrl={serviceUrl.value}
+                                serviceType={serviceType}
+                                serviceUrl={serviceUrl}
                                 styleObj={it.styleObj}
                                 clearStyle={it.clearStyle}
                                 onMouseMove={this.onMouseMove}
@@ -150,9 +189,9 @@ export default class Map extends React.Component {
                             key='rollermap'
                             onMapload={this.onRollerMapload}
                             mapId='rollermap'
-                            baseLayerMetaInfo={baseLayerMetaInfo}
-                            serviceType={serviceType.value}
-                            serviceUrl={serviceUrl.value}
+                            url={url}
+                            serviceType={serviceType}
+                            serviceUrl={serviceUrl}
 
                         ></RollerMap>
                     }
