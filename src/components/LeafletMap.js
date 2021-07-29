@@ -34,6 +34,7 @@ class LeafletMap extends GxMap {
             crs: L.CRS.EPSG3857,
             minZoom: 3,
             maxBounds: L.latLngBounds(L.latLng(-90, -180), L.latLng(90, 180)),
+            attributionControl:false
         });
         if (obj && obj.zoomNotShow) {
 

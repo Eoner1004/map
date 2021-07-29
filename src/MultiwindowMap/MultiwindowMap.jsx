@@ -1,13 +1,11 @@
 
 
 import React from 'react'
-// import { connect } from 'dva';
 
-import MapControl from './MapControl'
+import MapControl from '../components/Map/MapControl'
 
-import BaseMapLayer from './layer/BaseMapLayer'
-import MetaLayer from './layer/MetaLayer'
-import UrlLayer from './layer/UrlLayer'
+import BaseMapLayer from '../components/Map/layer/BaseMapLayer'
+import UrlLayer from '../components/Map/layer/UrlLayer'
 
 import { Icon } from 'antd';
 
@@ -83,14 +81,10 @@ class MultiwindowMap extends React.PureComponent {
     }
     render() {
 
-        // let baseLayerMetaInfo = this.props.baseLayerMetaInfo
         let serviceType = this.props.serviceType
         let serviceUrl = this.props.serviceUrl
-        // let showDataList = this.state.showDataList
         let mapId = this.props.mapId
         let styleObj = this.props.styleObj
-        // let clearStyle = this.props.clearStyle
-
 
         let obj = {
             zoomNotShow: this.props.zoomNotShow,

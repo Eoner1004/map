@@ -1,19 +1,16 @@
 
 
 import React from 'react'
-// import { connect } from 'dva';
 
-import MapControl from './MapControl'
+import MapControl from '../components/Map/MapControl'
 
-import BaseMapLayer from './layer/BaseMapLayer'
-// import MetaLayer from './layer/MetaLayer'
+import BaseMapLayer from '../components/Map/layer/BaseMapLayer'
+import UrlLayer from '../components/Map/layer/UrlLayer'
 
 import TimelineChart from './timelineChart'
-// import './d3/timeline-chart.css'
 import './timeline-chart.css'
 
 import moment from 'moment'
-import UrlLayer from './layer/UrlLayer'
 
 
 class TimeSeriesMap extends React.PureComponent {
@@ -53,7 +50,6 @@ class TimeSeriesMap extends React.PureComponent {
         event.persist()
         event.stopPropagation();  //阻止冒泡
 
-        // let showData = this.props.mapData.get('dragData')
         let showData = this.props.showData
 
         if (showData) {
@@ -65,9 +61,8 @@ class TimeSeriesMap extends React.PureComponent {
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
-        if(this.props.metaList.length!==nextProps.metaList.length){
+        // if(this.props.metaList.length!==nextProps.metaList.length){
             let metaList = nextProps.metaList
-            // let selectTimeItem = metaList[0]
             if (metaList) {
                 let time = this.getTime(metaList)
                 if (this.state.timeline && time) {
@@ -75,7 +70,7 @@ class TimeSeriesMap extends React.PureComponent {
                     this.state.timeline.updateData(this.getData(metaList, null))
                 }
     
-            }
+            // }
         }
     }
     getTime(list) {
@@ -99,8 +94,6 @@ class TimeSeriesMap extends React.PureComponent {
                 timeline: timeline,
             })
             window.onresize = () => {
-                // let metaList = this.props.mapData.get('selectList')
-                // let selectTimeItem = this.props.mapData.get('selectTimeItem')
                 let metaList = this.props.metaList
                 let selectTimeItem = metaList[0]
                 timeline.updateXAxis(this.getData(metaList, selectTimeItem))
@@ -108,11 +101,6 @@ class TimeSeriesMap extends React.PureComponent {
         }
     }
     clickPoint = (e) => {
-        // this.props.dispatch({
-        //     type: 'mapData/setSelectTimeItem',
-        //     item: data.metaInfo
-        // })
-        // let metaList = this.props.mapData.get('selectList')
         let data = e.target.__data__
 
         const {metaList} = this.props
@@ -142,16 +130,14 @@ class TimeSeriesMap extends React.PureComponent {
 
     render() {
 
-        // let baseLayerMetaInfo = this.props.baseLayerMetaInfo
         let serviceType = this.props.serviceType
         let serviceUrl = this.props.serviceUrl
         let mapId = this.props.mapId
 
-        // let metaList = this.props.mapData.get('selectList')
-        // let selectTimeItem = this.props.mapData.get('selectTimeItem')
         let selectTimeItem = this.state.selectTimeItem
         let obj = {
-            zoomNotShow: this.props.zoomNotShow
+            zoomNotShow: true,
+            notShowZoomslider: true,
         }
         return (
             <div className='brace-up' onDrop={this.onDrop.bind(this)} onDragOver={this.onDragOver.bind(this)}>
@@ -163,13 +149,10 @@ class TimeSeriesMap extends React.PureComponent {
                     {serviceType && serviceUrl &&
                         <BaseMapLayer serviceType={serviceType} serviceUrl={serviceUrl}></BaseMapLayer>
                     }
-                    {/* {metaList && metaList.map(metaInfo => {
-                        return (<MetaLayer key={metaInfo.id} metaInfo={metaInfo}></MetaLayer>)
-                    })} */}
-                    {/* {selectTimeItem && <MetaLayer key={selectTimeItem.id} metaInfo={selectTimeItem}></MetaLayer>} */}
+
                     {selectTimeItem && <UrlLayer key={selectTimeItem.id} url={selectTimeItem.url}></UrlLayer>}
                 </MapControl>
-                <div id='d3svg' ref={this.initD3} style={{ height: '70px', position: 'absolute', left: '8px', bottom: '25px', right: '43px', zIndex: 1100, backgroundColor: 'rgba(255, 255, 255, 0.5)', borderRadius: '3px' }}></div>
+                <div id='d3svg' ref={this.initD3} style={{ height: '70px', position: 'absolute', left: '8px', bottom: '25px', right: '8px', zIndex: 1100, backgroundColor: 'rgba(255, 255, 255, 0.5)', borderRadius: '3px' }}></div>
             </div>
 
         )

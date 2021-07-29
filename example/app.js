@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import '../node_modules/leaflet/dist/leaflet.css'
-import { Map } from '../src/components';
+import Map from './Map';
 import {DatePicker,Button} from 'antd';
 import moment from 'moment';
 import '../node_modules/antd/dist/antd.css';
@@ -64,7 +64,7 @@ function App() {
   const [type, setType] = useState('normal');
   const [basemMapType, setBasemMapType] = useState('xyz');
   const [basemMapUrl, setBasemMapUrl] = useState('https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
-  console.log(url)
+
   return (
     <div>
       <div style={{zIndex:999,position:'absolute',background:'white',padding:'8px 8px'}}>

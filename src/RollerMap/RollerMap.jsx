@@ -1,22 +1,16 @@
 
 
 import React from 'react'
-// import { connect } from 'dva';
 import L from 'leaflet'
 
 import './leafletSide/layout.css'
 import './leafletSide/range.css'
 import './leafletSide/leaflet-side-by-side'
 
-import MapControl from './MapControl'
+import MapControl from '../components/Map/MapControl'
 
-import BaseMapLayer from './layer/BaseMapLayer'
-// import MetaLayer from './layer/RollerMetaLayer'
-import UrlLayer from './layer/UrlLayer'
-
-
-// import { Icon } from 'antd';
-
+import BaseMapLayer from '../components/Map/layer/BaseMapLayer'
+import UrlLayer from '../components/Map/layer/UrlLayer'
 
 class RollerMap extends React.PureComponent {
 
@@ -133,7 +127,6 @@ class RollerMap extends React.PureComponent {
     }
     onLeftLayer = (layer) => {
         this.leftLayer = layer
-        console.log(this.leftLayer,'this.leftLayer')
         // this.openRoller()
         let sideMap = this.state.sideMap
         if (sideMap) {
