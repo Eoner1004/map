@@ -58,13 +58,15 @@ function App() {
   }
   
   const dateFormat = 'YYYY/MM/DD';
-  const [url, setUrl] = useState(null)
+  const [url, setUrl] = useState( ['http://10.16.28.4:8082/datamg-server/datamg/services/preview?crs=EPSG:3857&l={z}&x={x}&y={y}&metaId=1361517649965056',
+  'http://10.16.28.4:8082/datamg-server/datamg/services/preview?crs=EPSG:3857&l={z}&x={x}&y={y}&metaId=1379939962961984',
+  ])
   const [value, setValue] = useState('');
   const [productTime, setProductTime] = useState(undefined);
-  const [type, setType] = useState('normal');
+  const [type, setType] = useState('roller');
   const [basemMapType, setBasemMapType] = useState('xyz');
   const [basemMapUrl, setBasemMapUrl] = useState('https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
-
+console.log(url)
   return (
     <div>
       <div style={{zIndex:999,position:'absolute',background:'white',padding:'8px 8px'}}>

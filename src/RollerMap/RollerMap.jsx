@@ -168,7 +168,7 @@ class RollerMap extends React.PureComponent {
         let leftData = url[0]
         let rightData = url[1]
         return (
-            <div className='brace-up rollermap' onDrop={this.onDrop.bind(this)} onDragOver={this.onDragOver.bind(this)}>
+            <div className='brace-up rollermap' style={{height:'100%'}} onDrop={this.onDrop.bind(this)} onDragOver={this.onDragOver.bind(this)}>
                 <MapControl
                     mapId={mapId}
                     onLoad={this.onMapload}

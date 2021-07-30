@@ -92,12 +92,21 @@ class TimeSeriesMap extends React.PureComponent {
             let timeline = new TimelineChart(ele, this.clickPoint);
             this.setState({
                 timeline: timeline,
+            },()=>{
+                // window.onresize = () => {
+                    let metaList = this.props.metaList
+                    // let selectTimeItem = metaList[0]
+                    // timeline.updateXAxis(this.getData(metaList, selectTimeItem))
+                if (metaList) {
+                    let time = this.getTime(metaList)
+                    if (this.state.timeline && time) {
+                        this.state.timeline.updateXAxis(this.getData(metaList), time.minDt, time.maxDt)
+                        this.state.timeline.updateData(this.getData(metaList, null))
+                    }
+                // }
+                }
             })
-            window.onresize = () => {
-                let metaList = this.props.metaList
-                let selectTimeItem = metaList[0]
-                timeline.updateXAxis(this.getData(metaList, selectTimeItem))
-            }
+            
         }
     }
     clickPoint = (e) => {
@@ -140,7 +149,7 @@ class TimeSeriesMap extends React.PureComponent {
             notShowZoomslider: true,
         }
         return (
-            <div className='brace-up' onDrop={this.onDrop.bind(this)} onDragOver={this.onDragOver.bind(this)}>
+            <div className='brace-up' style={{height:'100%'}} onDrop={this.onDrop.bind(this)} onDragOver={this.onDragOver.bind(this)}>
                 <MapControl
                     mapId={mapId}
                     obj={obj}
