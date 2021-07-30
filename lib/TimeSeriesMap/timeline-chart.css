@@ -1,0 +1,42 @@
+.timeline-chart .axis path {
+  fill: none;
+  stroke: none;
+}
+
+.timeline-chart line {
+  stroke: black;
+}
+
+.timeline-chart rect,
+.timeline-chart rect.chart-bounds {
+  fill: transparent;
+}
+
+.timeline-chart rect.chart-bounds:hover,
+.timeline-chart rect.interval:hover {
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+
+.timeline-chart rect.chart-bounds:active,
+.timeline-chart rect.interval:active {
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}
+
+.timeline-chart .dot:hover {
+  cursor: pointer;
+}
+
+.timeline-chart .axis g {
+  font-size: 16px;
+}
+
+.timeline-chart .item text{
+  font-size: 14px;
+  /* fill: none; */
+  font-weight: bold;
+  stroke: #fff;
+  stroke-width: 0.3px;
+
+}

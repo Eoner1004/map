@@ -1,5 +1,5 @@
 {
-  "name": "map",
+  "name": "mapvision",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --open development",
     "build": "webpack --mode production",
-    "compile":"npx babel src -d lib --copy-files",
-    "deploy":"npm run compile && npm publish --registry=https://maven.geosts.org/repository/local-npm/"
+    "compile": "npx babel src -d lib --copy-files",
+    "deploy": "npm run compile && npm publish --registry=https://maven.geosts.org/repository/local-npm/"
   },
   "keywords": [],
   "author": "",
@@ -36,7 +36,6 @@
     "css-loader": "^5.0.0",
     "d3": "^7.0.0",
     "leaflet": "^1.7.1",
-    "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "style-loader": "^2.0.0"
   }
