@@ -12,6 +12,9 @@ class Index extends Component {
                 gxMap.resize()
             }
         }, 200)
+        if(this.props.onMapload){
+            this.props.onMapload(gxMap)
+        }
     }
     render() {
         const { url, serviceType, serviceUrl } = this.props
@@ -22,7 +25,6 @@ class Index extends Component {
                             metaList={url}
                             serviceType={serviceType}
                             serviceUrl={serviceUrl}
-
                         ></TimeSeriesMap>
         );
     }

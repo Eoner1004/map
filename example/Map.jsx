@@ -13,6 +13,10 @@ export default class Map extends React.Component {
                     serviceType={serviceType}
                     serviceUrl={serviceUrl}
                     url={url}
+                    metaList
+                    geometrys
+                    onQueryFeature={this.onQueryFeature}
+                    onMapload={this.onMapload}
                 >
                 </CommonMap>}
 
@@ -28,6 +32,7 @@ export default class Map extends React.Component {
                     url={url}
                     serviceType={serviceType}
                     serviceUrl={serviceUrl}
+                    dragData
                 ></MultiwindowMap>}
 
             {isMapType === 'roller' &&
@@ -35,6 +40,7 @@ export default class Map extends React.Component {
                     url={url}
                     serviceType={serviceType}
                     serviceUrl={serviceUrl}
+                    dragData
                 ></RollerMap>}
         </div>
     }

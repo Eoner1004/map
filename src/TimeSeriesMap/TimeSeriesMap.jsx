@@ -161,7 +161,7 @@ class TimeSeriesMap extends React.PureComponent {
 
                     {selectTimeItem && <UrlLayer key={selectTimeItem.id} url={selectTimeItem.url}></UrlLayer>}
                 </MapControl>
-                <div id='d3svg' ref={this.initD3} style={{ height: '70px', position: 'absolute', left: '8px', bottom: '25px', right: '8px', zIndex: 1100, backgroundColor: 'rgba(255, 255, 255, 0.5)', borderRadius: '3px' }}></div>
+                <div id='d3svg' ref={this.initD3} style={{ height: '70px', position: 'absolute', left: '8px', bottom: '5px', right: '8px', zIndex: 1100, backgroundColor: 'rgba(255, 255, 255, 0.5)', borderRadius: '3px' }}></div>
             </div>
 
         )

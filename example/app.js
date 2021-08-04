@@ -66,7 +66,6 @@ function App() {
   const [type, setType] = useState('roller');
   const [basemMapType, setBasemMapType] = useState('xyz');
   const [basemMapUrl, setBasemMapUrl] = useState('https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
-console.log(url)
   return (
     <div>
       <div style={{zIndex:999,position:'absolute',background:'white',padding:'8px 8px'}}>

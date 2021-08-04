@@ -1,40 +1,32 @@
 import React from 'react'
 import L from 'leaflet'
+// import lodash from 'lodash'
 // import * as esri from 'esri-leaflet'
 import bbox from '@turf/bbox';
 
-class UrlLayer extends React.PureComponent {
+class MetaLayer extends React.PureComponent {
     componentWillUnmount() {
         this.removeLayers()
     }
     componentDidMount() {
-        this.layerIndex = this.props.layerIndex
-        // this.metaInfoId = this.props.metaInfo.id
-
         this.updateMapLayer(this.props)
     }
     UNSAFE_componentWillReceiveProps(nextProps) {
-        let url = this.url !== nextProps.url
+        // let result = lodash.eq(this.props.metaInfo, nextProps.metaInfo)
+        let result = JSON.stringify(this.props.metaInfo)===JSON.stringify(nextProps.metaInfo)
 
-        if (url) {
+        if (!result) {
             this.updateMapLayer(nextProps)
         }
-
-
-        // let result = lodash.eq(this.metaInfo, nextProps.metaInfo)
-        // if (!result) {
-        //     this.updateMapLayer(nextProps)
-        // }
     }
     updateMapLayer(props) {
-
         let layer = null
         if (props.gxMap) {
-            let url = props.url
+            let metaInfo = props.metaInfo
             if (this.layerId) {
                 this.removeLayers()
             }
-            layer = this.createMetaMapLayer(url)
+            layer = this.createMetaMapLayer(metaInfo)
             if (layer) {
                 if (props.layerGroup) {
                     props.layerGroup.addLayer(layer)
@@ -47,10 +39,10 @@ class UrlLayer extends React.PureComponent {
             }
 
         }
+
         if (this.props.onRef) {
             this.props.onRef(layer)
         }
-
     }
     removeLayers() {
         if (this.props.gxMap) {
@@ -67,16 +59,33 @@ class UrlLayer extends React.PureComponent {
     /**
  * 创建元信息图层  影像 矢量  dem
  */
-    createGxLayer(url) {
-        
-        let layer = new L.TileLayer(url)
+    createGxLayer(metaData) {
+        let url = metaData.datamgUrl + "services/preview?crs=EPSG:3857&l={z}&x={x}&y={y}&metaId=" + metaData.id
+
+        let bounds = null;
+        if (metaData.geometry) {
+            try {
+                let geometry = JSON.parse(metaData.geometry)
+
+                let box = bbox(geometry);
+                var corner1 = L.latLng(box[1], box[0])
+                let corner2 = L.latLng(box[3], box[2])
+                bounds = L.latLngBounds(corner1, corner2);
+
+
+            } catch (error) {
+
+            }
+
+        }
+
+        let layer = new L.TileLayer(url, bounds == null ? {} : { bounds: bounds, maxZoom: 24 })
         let index = 950
-        if (this.layerIndex) {
-            index = 950 + this.layerIndex * 5
+        if (this.props.layerIndex) {
+            index = 950 + this.props.layerIndex
         }
         layer.setZIndex(index)
         return layer
-
     }
     createServiceLayer(serviceUrl) {
         // let layer = esri.dynamicMapLayer({
@@ -92,7 +101,7 @@ class UrlLayer extends React.PureComponent {
     }
     createXyzServiceLayer(serviceUrl, attribution) {
         let layer = L.tileLayer(serviceUrl.value, {
-            maxZoom: 24,
+            maxZoom: 20,
             minZoom: 0
         });
         layer.setZIndex(900)
@@ -103,12 +112,26 @@ class UrlLayer extends React.PureComponent {
   * @param {*} action 
   * @param {*} tempLayer 
   */
-    createMetaMapLayer(url) {
-        
+    createMetaMapLayer(metaData) {
         let layer = null
-        layer = this.createGxLayer(url)
+        if (metaData.imgType === "Raster" || metaData.imgType === "Vector" || metaData.imgType === "Dem") {
+            layer = this.createGxLayer(metaData)
+        } else if (metaData.imgType === "Service") {
+            let serviceType = metaData.attributes.find(it => it.field.name === 'serviceType')
+            let serviceUrl = metaData.attributes.find(it => it.field.name === 'serviceUrl')
+            //版权
+            let attribution = metaData.attributes.find(it => it.field.name === 'attribution')
 
-        this.url = url
+            if (serviceType && serviceUrl) {
+                if (serviceType.value === "esri") {
+                    layer = this.createServiceLayer(serviceUrl)
+                } else if (serviceType.value === "xyz") {
+                    layer = this.createXyzServiceLayer(serviceUrl, attribution)
+                }
+            }
+        }
+
+        this.metaData = metaData
         return layer
     }
 
@@ -119,4 +142,4 @@ class UrlLayer extends React.PureComponent {
     }
 }
 
-export default UrlLayer
+export default MetaLayer

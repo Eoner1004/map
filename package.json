@@ -1,6 +1,6 @@
 {
-  "name": "mapvision",
-  "version": "1.0.0",
+  "name": "gx-mapvis",
+  "version": "0.1.1",
   "description": "",
   "main": "lib/index.js",
   "scripts": {

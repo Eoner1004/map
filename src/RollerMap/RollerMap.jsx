@@ -11,6 +11,7 @@ import MapControl from '../components/Map/MapControl'
 
 import BaseMapLayer from '../components/Map/layer/BaseMapLayer'
 import UrlLayer from '../components/Map/layer/UrlLayer'
+import MetaLayer from '../components/Map/layer/RollerMetaLayer'
 
 class RollerMap extends React.PureComponent {
 
@@ -83,7 +84,7 @@ class RollerMap extends React.PureComponent {
         leftNum = Number(leftNum)
 
         // let showData = this.props.mapData.get('dragData')
-        let showData = this.props.showData
+        let showData = this.props.dragData
 
         if (showData) {
 
@@ -118,12 +119,29 @@ class RollerMap extends React.PureComponent {
         }
     }
     location = (showData) => {
-        let geometry = JSON.parse(showData.geometry)
         let gxMap = this.state.gxMap
 
-        if (geometry && gxMap) {
-            gxMap.locationGeometry(geometry)
-        }
+        let geometry = null
+        let point = null
+        let zoom = null
+            if(showData.geometry){
+                geometry = JSON.parse(showData.geometry)
+            }else if(showData.attributes){
+                showData.attributes.forEach(it=>{
+                    if(it.field.name==='centerPoint'){
+                        let centerPoint=JSON.parse(it.value)
+                        point=[centerPoint[1],centerPoint[0]]
+                    }else if(it.field.name==='zoom'){
+                        zoom=it.value
+                    }
+                })
+            }
+            if (geometry && gxMap) {
+                gxMap.locationGeometry(geometry)
+            }else if(point&&zoom&& gxMap){
+                gxMap.locationPoint(point,zoom)
+            }
+        
     }
     onLeftLayer = (layer) => {
         this.leftLayer = layer
@@ -157,16 +175,20 @@ class RollerMap extends React.PureComponent {
     render() {
 
         // let baseLayerMetaInfo = this.props.baseLayerMetaInfo
-        let url = this.props.url
-        let serviceType = this.props.serviceType
-        let serviceUrl = this.props.serviceUrl
-        let mapId = this.props.mapId
+        const {dragData,url,serviceType,serviceUrl,mapId} = this.props
+        
         let sideMap = this.state.sideMap
 
-        // let leftData = this.state.leftData
-        // let rightData = this.state.rightData
-        let leftData = url[0]
-        let rightData = url[1]
+        let leftData = null
+        let rightData = null
+        if(url){
+            leftData = url[0]
+            rightData = url[1]
+        }else{
+            leftData = this.state.leftData
+            rightData = this.state.rightData
+        }
+        
         return (
             <div className='brace-up rollermap' style={{height:'100%'}} onDrop={this.onDrop.bind(this)} onDragOver={this.onDragOver.bind(this)}>
                 <MapControl
@@ -177,10 +199,10 @@ class RollerMap extends React.PureComponent {
                         <BaseMapLayer serviceType={serviceType} serviceUrl={serviceUrl}></BaseMapLayer>
                     }
 
-                    {/* {leftData && <MetaLayer onRef={this.onLeftLayer} key={leftData.id} metaInfo={leftData}></MetaLayer>}
-                    {rightData && <MetaLayer onRef={this.onRightLayer} key={rightData.id} metaInfo={rightData}></MetaLayer>} */}
-                    {leftData&& sideMap && <UrlLayer onRef={this.onLeftLayer} key={1} url={leftData}></UrlLayer>}
-                    {rightData&& sideMap  && <UrlLayer onRef={this.onRightLayer} key={2} url={rightData}></UrlLayer>}
+                    {dragData&&leftData && <MetaLayer onRef={this.onLeftLayer} key={leftData.id} metaInfo={leftData}></MetaLayer>}
+                    {dragData&&rightData && <MetaLayer onRef={this.onRightLayer} key={rightData.id} metaInfo={rightData}></MetaLayer>}
+                    {url&&leftData&& sideMap && <UrlLayer onRef={this.onLeftLayer} key={1} url={leftData}></UrlLayer>}
+                    {url&&rightData&& sideMap  && <UrlLayer onRef={this.onRightLayer} key={2} url={rightData}></UrlLayer>}
                 </MapControl>
 
 

@@ -14,7 +14,7 @@ class Index extends Component {
         }, 200)
     }
     render() {
-        const { url, serviceType, serviceUrl } = this.props
+        const { url, serviceType, serviceUrl,dragData } = this.props
         return (
             <RollerMap
                 key='rollermap'
@@ -23,7 +23,7 @@ class Index extends Component {
                 url={url}
                 serviceType={serviceType}
                 serviceUrl={serviceUrl}
-
+                dragData={dragData}
             ></RollerMap>
         );
     }

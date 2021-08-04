@@ -6,6 +6,7 @@ import MapControl from '../components/Map/MapControl'
 
 import BaseMapLayer from '../components/Map/layer/BaseMapLayer'
 import UrlLayer from '../components/Map/layer/UrlLayer'
+import MetaLayer from '../components/Map/layer/MetaLayer'
 
 import { Icon } from 'antd';
 
@@ -49,8 +50,7 @@ class MultiwindowMap extends React.PureComponent {
         event.persist()
         event.stopPropagation();  //阻止冒泡
 
-        // let showData = this.props.mapData.get('dragData')
-        let showData = {}
+        let showData = this.props.dragData
         let showDataList = [...this.state.showDataList]
         if (showData) {
             let newShowDataList = showDataList.filter(it => it.id !== showData.id)
@@ -58,9 +58,25 @@ class MultiwindowMap extends React.PureComponent {
             this.setState({
                 showDataList: newShowDataList
             })
-            let geometry = JSON.parse(showData.geometry)
+            let geometry = null
+            let point = null
+            let zoom = null
+            if(showData.geometry){
+                geometry = JSON.parse(showData.geometry)
+            }else if(showData.attributes){
+                showData.attributes.forEach(it=>{
+                    if(it.field.name==='centerPoint'){
+                        let centerPoint=JSON.parse(it.value)
+                        point=[centerPoint[1],centerPoint[0]]
+                    }else if(it.field.name==='zoom'){
+                        zoom=it.value
+                    }
+                })
+            }
             if (geometry) {
                 this.state.gxMap.locationGeometry(geometry)
+            }else if(point&&zoom){
+                this.state.gxMap.locationPoint(point,zoom)
             }
         }
     }
@@ -80,11 +96,7 @@ class MultiwindowMap extends React.PureComponent {
         }
     }
     render() {
-
-        let serviceType = this.props.serviceType
-        let serviceUrl = this.props.serviceUrl
-        let mapId = this.props.mapId
-        let styleObj = this.props.styleObj
+        const {dragData,serviceType,serviceUrl,mapId,styleObj} = this.props
 
         let obj = {
             zoomNotShow: this.props.zoomNotShow,
@@ -94,7 +106,7 @@ class MultiwindowMap extends React.PureComponent {
         let mouseTop = this.props.mouseTop-15 || 20
         let mouseleft = this.props.mouseleft-15 || 20
         let haveMouse = this.props.haveMouse
-        let showDataList = this.props.showDataList
+        let showDataList = this.state.showDataList.length?this.state.showDataList:this.props.showDataList
 
         return (
             <div
@@ -115,12 +127,12 @@ class MultiwindowMap extends React.PureComponent {
                     {serviceType && serviceUrl &&
                         <BaseMapLayer serviceType={serviceType} serviceUrl={serviceUrl}></BaseMapLayer>
                     }
-                    {/* {
-                        showDataList && showDataList.length > 0 && showDataList.map(it => <MetaLayer key={it.id} metaInfo={it}></MetaLayer>)
-                    } */}
-                    {/* {showData && <MetaLayer key={showData.id} metaInfo={showData}></MetaLayer>} */}
                     {
-                        showDataList && typeof(showDataList)!=='string' && showDataList.length > 0 && showDataList.map((it,id) => <UrlLayer key={id} a={id} url={it}></UrlLayer>)
+                        dragData&&showDataList && showDataList.length > 0 && showDataList.map(it => <MetaLayer key={it.id} metaInfo={it}></MetaLayer>)
+                    }
+                    {/* {   dragData&&showData && <MetaLayer key={showData.id} metaInfo={showData}></MetaLayer>} */}
+                    {
+                        !dragData&&showDataList && typeof(showDataList)!=='string' && showDataList.length > 0 && showDataList.map((it,index) => <UrlLayer key={index} url={it}></UrlLayer>)
                     }
                 </MapControl>
                 {/* <div style={Object.assign({ position: 'absolute', zIndex: '1200', backgroundColor: '#fff', borderRadius: '3px' }, clearStyle)}> */}

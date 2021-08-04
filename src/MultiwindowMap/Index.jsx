@@ -48,14 +48,14 @@ class Index extends Component {
 
     }
     render() {
-        const {url,serviceType,serviceUrl} = this.props
+        const {url,serviceType,serviceUrl,dragData} = this.props
         let haveMouse = this.state.haveMouse
         let mouseTop = this.state.mouseTop || 20
         let mouseleft = this.state.mouseleft || 20
         return (
             <div className='brace-up'>
                 {multiwindowMapList.map((it, index) => <MultiwindowMap
-                    showDataList={[url[index]]}
+                    showDataList={url&&url.length?[url[index]]:[]}
                     key={it.mapId}
                     onMapload={this.onMultiwindowMapload}
                     notShowZoomslider={it.notShowZoomslider}
@@ -68,6 +68,7 @@ class Index extends Component {
                     mouseTop={mouseTop}
                     mouseleft={mouseleft}
                     haveMouse={haveMouse}
+                    dragData={dragData}
                 ></MultiwindowMap>)}
             </div>
         );
