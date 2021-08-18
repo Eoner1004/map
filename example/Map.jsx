@@ -13,7 +13,8 @@ export default class Map extends React.Component {
                     serviceType={serviceType}
                     serviceUrl={serviceUrl}
                     url={url}
-                    metaList
+                    metaList={null}
+                    serviceItem
                     geometrys
                     onQueryFeature={this.onQueryFeature}
                     onMapload={this.onMapload}

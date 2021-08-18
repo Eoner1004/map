@@ -7,6 +7,7 @@ import MapControl from '../components/Map/MapControl'
 import BaseMapLayer from '../components/Map/layer/BaseMapLayer'
 import UrlLayer from '../components/Map/layer/UrlLayer'
 import MetaLayer from '../components/Map/layer/MetaLayer'
+import PubSub from 'pubsub-js'
 
 import { Icon } from 'antd';
 
@@ -17,16 +18,23 @@ class MultiwindowMap extends React.PureComponent {
         this.state = {
             gxMap: null,
             showDataList: [],
-            haveMouse: false
+            haveMouse: false,
+            dragData:null
         }
     }
     componentDidMount() {
-
+        //订阅树节点拖拽事件
+        this.pubsub_dragdata = PubSub.subscribe('setDragData', (topic, dragData) => {
+            this.setState({
+                dragData
+            })
+        })
     }
     componentWillUnmount() {
         this.setState({
             showDataList: []
         })
+        PubSub.unsubscribe(this.pubsub_dragdata);
     }
     clearData = () => {
         this.setState({
@@ -50,7 +58,7 @@ class MultiwindowMap extends React.PureComponent {
         event.persist()
         event.stopPropagation();  //阻止冒泡
 
-        let showData = this.props.dragData
+        let showData = this.state.dragData
         let showDataList = [...this.state.showDataList]
         if (showData) {
             let newShowDataList = showDataList.filter(it => it.id !== showData.id)
@@ -61,22 +69,22 @@ class MultiwindowMap extends React.PureComponent {
             let geometry = null
             let point = null
             let zoom = null
-            if(showData.geometry){
+            if (showData.geometry) {
                 geometry = JSON.parse(showData.geometry)
-            }else if(showData.attributes){
-                showData.attributes.forEach(it=>{
-                    if(it.field.name==='centerPoint'){
-                        let centerPoint=JSON.parse(it.value)
-                        point=[centerPoint[1],centerPoint[0]]
-                    }else if(it.field.name==='zoom'){
-                        zoom=it.value
+            } else if (showData.attributes) {
+                showData.attributes.forEach(it => {
+                    if (it.field.name === 'centerPoint') {
+                        let centerPoint = JSON.parse(it.value)
+                        point = [centerPoint[1], centerPoint[0]]
+                    } else if (it.field.name === 'zoom') {
+                        zoom = it.value
                     }
                 })
             }
             if (geometry) {
                 this.state.gxMap.locationGeometry(geometry)
-            }else if(point&&zoom){
-                this.state.gxMap.locationPoint(point,zoom)
+            } else if (point && zoom) {
+                this.state.gxMap.locationPoint(point, zoom)
             }
         }
     }
@@ -96,17 +104,17 @@ class MultiwindowMap extends React.PureComponent {
         }
     }
     render() {
-        const {dragData,serviceType,serviceUrl,mapId,styleObj} = this.props
+        const { dragData, serviceType, serviceUrl, mapId, styleObj } = this.props
 
         let obj = {
             zoomNotShow: this.props.zoomNotShow,
             notShowZoomslider: this.props.notShowZoomslider,
         }
 
-        let mouseTop = this.props.mouseTop-15 || 20
-        let mouseleft = this.props.mouseleft-15 || 20
+        let mouseTop = this.props.mouseTop - 15 || 20
+        let mouseleft = this.props.mouseleft - 15 || 20
         let haveMouse = this.props.haveMouse
-        let showDataList = this.state.showDataList.length?this.state.showDataList:this.props.showDataList
+        let showDataList = this.state.showDataList.length ? this.state.showDataList : this.props.showDataList
 
         return (
             <div
@@ -128,16 +136,16 @@ class MultiwindowMap extends React.PureComponent {
                         <BaseMapLayer serviceType={serviceType} serviceUrl={serviceUrl}></BaseMapLayer>
                     }
                     {
-                        dragData&&showDataList && showDataList.length > 0 && showDataList.map(it => <MetaLayer key={it.id} metaInfo={it}></MetaLayer>)
+                        dragData && showDataList && showDataList.length > 0 && showDataList.map(it => <MetaLayer key={it.id} metaInfo={it}></MetaLayer>)
                     }
                     {/* {   dragData&&showData && <MetaLayer key={showData.id} metaInfo={showData}></MetaLayer>} */}
                     {
-                        !dragData&&showDataList && typeof(showDataList)!=='string' && showDataList.length > 0 && showDataList.map((it,index) => <UrlLayer key={index} url={it}></UrlLayer>)
+                        !dragData && showDataList && typeof (showDataList) !== 'string' && showDataList.length > 0 && showDataList.map((it, index) => <UrlLayer key={index} url={it}></UrlLayer>)
                     }
                 </MapControl>
                 {/* <div style={Object.assign({ position: 'absolute', zIndex: '1200', backgroundColor: '#fff', borderRadius: '3px' }, clearStyle)}> */}
-                    {/* <Button size='small' onClick={this.clearData}>清空</Button> */}
-                    {/* {showDataList && typeof(showDataList)!=='string' && showDataList.length > 0 && showDataList.map((it,id) => <div key={id} className='cle' style={{ padding: '2px' }}>
+                {/* <Button size='small' onClick={this.clearData}>清空</Button> */}
+                {/* {showDataList && typeof(showDataList)!=='string' && showDataList.length > 0 && showDataList.map((it,id) => <div key={id} className='cle' style={{ padding: '2px' }}>
                         <div className='dot' style={{ width: '100px', float: 'left', lineHeight: '26px' }} title={it.name}>{it.name}</div>
                         <Icon type="close" className='hover-icon' style={{ float: 'right', marginTop: '6px', marginLeft: '5px', cursor: 'pointer' }} onClick={() => this.closeItem(it)} />
                     </div>)} */}

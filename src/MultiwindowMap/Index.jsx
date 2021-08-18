@@ -1,17 +1,41 @@
 import React, { Component } from 'react';
 import MultiwindowMap from './MultiwindowMap';
 import { multiwindowMapList } from './multiwindowMapList'
+import PubSub from 'pubsub-js'
+import MetaInfo from '../components/Map/MetaInfo'
 
 let mapList = []
 
 class Index extends Component {
     constructor(props){
         super(props)
+        let baseLayerMetaInfo = this.getBaseMapMetaInfo()
         this.state={
             mouseTop: 10,
             mouseleft: 10,
             haveMouse: null,
+            baseLayerMetaInfo:baseLayerMetaInfo
         }
+    }
+    getBaseMapMetaInfo() {
+        let baseMap = localStorage.getItem('baseMap') || ''
+        if (baseMap) {
+            let item = JSON.parse(baseMap)
+            let metainfo = Object.assign(new MetaInfo(), item)
+            return metainfo
+        }
+        return null
+    }
+    componentDidMount(){
+        //订阅底图切换事件
+        this.pubsub_basemapchange = PubSub.subscribe('changeBaseMap', (topic, baseLayerMetaInfo)=>{
+            this.setState({
+                baseLayerMetaInfo
+            })
+        })
+    }
+    componentWillUnmount() {
+        PubSub.unsubscribe(this.pubsub_basemapchange);
     }
     onMultiwindowMapload = (gxMap, mapId) => {
         if (mapList.length === 4) {
@@ -48,7 +72,10 @@ class Index extends Component {
 
     }
     render() {
-        const {url,serviceType,serviceUrl,dragData} = this.props
+        let baseLayerMetaInfo = this.state.baseLayerMetaInfo
+        let serviceType = baseLayerMetaInfo ? baseLayerMetaInfo.getAttribute('serviceType') : ""
+        let serviceUrl = baseLayerMetaInfo ? baseLayerMetaInfo.getAttribute('serviceUrl') : ""
+        const {url,dragData} = this.props
         let haveMouse = this.state.haveMouse
         let mouseTop = this.state.mouseTop || 20
         let mouseleft = this.state.mouseleft || 20
@@ -61,8 +88,8 @@ class Index extends Component {
                     notShowZoomslider={it.notShowZoomslider}
                     zoomNotShow={it.zoomNotShow}
                     mapId={it.mapId}
-                    serviceType={serviceType}
-                    serviceUrl={serviceUrl}
+                    serviceType={serviceType.value}
+                    serviceUrl={serviceUrl.value}
                     styleObj={it.styleObj}
                     onMouseMove={this.onMouseMove}
                     mouseTop={mouseTop}

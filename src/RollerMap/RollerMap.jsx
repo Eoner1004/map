@@ -31,13 +31,19 @@ class RollerMap extends React.PureComponent {
         this.rightLayer = null
     }
     componentDidMount() {
-
+        //订阅树节点拖拽事件
+        this.pubsub_dragdata = PubSub.subscribe('setDragData', (topic, dragData) => {
+            this.setState({
+                dragData
+            })
+        })
     }
     componentWillUnmount() {
         // this.props.dispatch({
         //     type: 'mapData/closeSelectList',
         // })
         this.closeRoller()
+        PubSub.unsubscribe(this.pubsub_dragdata);
     }
     openRoller = () => {
 
@@ -124,24 +130,24 @@ class RollerMap extends React.PureComponent {
         let geometry = null
         let point = null
         let zoom = null
-            if(showData.geometry){
-                geometry = JSON.parse(showData.geometry)
-            }else if(showData.attributes){
-                showData.attributes.forEach(it=>{
-                    if(it.field.name==='centerPoint'){
-                        let centerPoint=JSON.parse(it.value)
-                        point=[centerPoint[1],centerPoint[0]]
-                    }else if(it.field.name==='zoom'){
-                        zoom=it.value
-                    }
-                })
-            }
-            if (geometry && gxMap) {
-                gxMap.locationGeometry(geometry)
-            }else if(point&&zoom&& gxMap){
-                gxMap.locationPoint(point,zoom)
-            }
-        
+        if (showData.geometry) {
+            geometry = JSON.parse(showData.geometry)
+        } else if (showData.attributes) {
+            showData.attributes.forEach(it => {
+                if (it.field.name === 'centerPoint') {
+                    let centerPoint = JSON.parse(it.value)
+                    point = [centerPoint[1], centerPoint[0]]
+                } else if (it.field.name === 'zoom') {
+                    zoom = it.value
+                }
+            })
+        }
+        if (geometry && gxMap) {
+            gxMap.locationGeometry(geometry)
+        } else if (point && zoom && gxMap) {
+            gxMap.locationPoint(point, zoom)
+        }
+
     }
     onLeftLayer = (layer) => {
         this.leftLayer = layer
@@ -175,22 +181,23 @@ class RollerMap extends React.PureComponent {
     render() {
 
         // let baseLayerMetaInfo = this.props.baseLayerMetaInfo
-        const {dragData,url,serviceType,serviceUrl,mapId} = this.props
-        
+        const { url, serviceType, serviceUrl, mapId } = this.props
+        const { dragData } = this.state
+
         let sideMap = this.state.sideMap
 
         let leftData = null
         let rightData = null
-        if(url){
+        if (url) {
             leftData = url[0]
             rightData = url[1]
-        }else{
+        } else {
             leftData = this.state.leftData
             rightData = this.state.rightData
         }
-        
+
         return (
-            <div className='brace-up rollermap' style={{height:'100%'}} onDrop={this.onDrop.bind(this)} onDragOver={this.onDragOver.bind(this)}>
+            <div className='brace-up rollermap' style={{ height: '100%' }} onDrop={this.onDrop.bind(this)} onDragOver={this.onDragOver.bind(this)}>
                 <MapControl
                     mapId={mapId}
                     onLoad={this.onMapload}
@@ -199,10 +206,10 @@ class RollerMap extends React.PureComponent {
                         <BaseMapLayer serviceType={serviceType} serviceUrl={serviceUrl}></BaseMapLayer>
                     }
 
-                    {dragData&&leftData && <MetaLayer onRef={this.onLeftLayer} key={leftData.id} metaInfo={leftData}></MetaLayer>}
-                    {dragData&&rightData && <MetaLayer onRef={this.onRightLayer} key={rightData.id} metaInfo={rightData}></MetaLayer>}
-                    {url&&leftData&& sideMap && <UrlLayer onRef={this.onLeftLayer} key={1} url={leftData}></UrlLayer>}
-                    {url&&rightData&& sideMap  && <UrlLayer onRef={this.onRightLayer} key={2} url={rightData}></UrlLayer>}
+                    {dragData && leftData && <MetaLayer onRef={this.onLeftLayer} key={leftData.id} metaInfo={leftData}></MetaLayer>}
+                    {dragData && rightData && <MetaLayer onRef={this.onRightLayer} key={rightData.id} metaInfo={rightData}></MetaLayer>}
+                    {url && leftData && sideMap && <UrlLayer onRef={this.onLeftLayer} key={1} url={leftData}></UrlLayer>}
+                    {url && rightData && sideMap && <UrlLayer onRef={this.onRightLayer} key={2} url={rightData}></UrlLayer>}
                 </MapControl>
 
 

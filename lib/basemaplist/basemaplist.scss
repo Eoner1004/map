@@ -1,0 +1,66 @@
+
+.base-map-list { 
+    width: 302px;
+    border-radius: 5px;
+    background-color: #fff;
+    padding: 4px;
+    transition: all 0.2s;
+
+    &>.layer-li {
+        float: left;
+        margin: 4px;
+        cursor: pointer;
+        border-radius: 4px;
+        position: relative;
+        &>img,span {
+            display: block;
+            width: 90px;
+            height: 60px;
+            border-radius: 4px;
+
+        }
+
+
+        .name {
+            width: 90px;
+            font-size: 14px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        &:hover {
+            margin: 3px;
+            border: 1px solid #1890ff;
+            .name {
+                color: #1890ff;
+            }
+        }
+    }
+
+    &>.click {
+        margin: 3px;
+        border: 1px solid #1890ff;
+        .name {
+            color: #1890ff;
+        }
+    }
+}
+
+.basemap-name{
+    width: 90px;
+    color: #fff;
+    cursor: pointer;
+    position: absolute;
+    bottom:3px;
+    text-align: center;
+    line-height: 20px;
+    background-color: rgba(0,0,0,0.65);
+}
+.open-img{
+    .ant-modal-content{
+        background-color: transparent;
+        box-shadow:none;
+        text-align: center;
+        margin-top: -100px;
+    }
+}
